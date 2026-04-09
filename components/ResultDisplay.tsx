@@ -25,7 +25,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
         setTimeout(() => setCopiedTitle(false), 2000);
       }
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error('Eroare la copiere:', err);
     }
   };
 
@@ -37,7 +37,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
         <div className="bg-white/5 px-6 py-3 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2 text-yellow-400">
             <TypeIcon className="w-4 h-4" />
-            <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Song Title</h3>
+            <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Titlul Melodiei</h3>
           </div>
         </div>
         <div className="p-6 relative group flex items-center justify-between">
@@ -45,7 +45,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
           <button
             onClick={() => copyToClipboard(data.suno_title, 'title')}
             className="p-2 bg-white/10 hover:bg-yellow-400/20 hover:text-yellow-400 text-white rounded-lg transition-colors"
-            title="Copy Title"
+            title="Copiază Titlul"
           >
             {copiedTitle ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
           </button>
@@ -57,10 +57,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
         <div className="bg-white/5 px-6 py-3 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2 text-suno-secondary">
             <Music className="w-4 h-4" />
-            <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Suno Style Prompt</h3>
+            <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Prompt de Stil Suno</h3>
           </div>
           <span className={`text-xs font-mono ${data.suno_style.length > 120 ? 'text-red-400' : 'text-green-400'}`}>
-            {data.suno_style.length}/120 chars
+            {data.suno_style.length}/120 caractere
           </span>
         </div>
         <div className="p-6 relative group">
@@ -70,7 +70,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
           <button
             onClick={() => copyToClipboard(data.suno_style, 'style')}
             className="absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-white/10 hover:bg-suno-secondary text-white rounded-lg transition-colors"
-            title="Copy Style"
+            title="Copiază Stilul"
           >
             {copiedStyle ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
           </button>
@@ -84,14 +84,14 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
           <div className="bg-white/5 px-6 py-3 border-b border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-2 text-suno-primary">
               <FileText className="w-4 h-4" />
-              <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Lyrics & Structure</h3>
+              <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Versuri & Structură</h3>
             </div>
             <button
               onClick={() => copyToClipboard(data.suno_lyrics, 'lyrics')}
               className="flex items-center gap-2 text-xs font-mono uppercase bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded transition-colors text-white"
             >
               {copiedLyrics ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              {copiedLyrics ? 'Copied' : 'Copy All'}
+              {copiedLyrics ? 'Copiat' : 'Copiază Tot'}
             </button>
           </div>
           <div className="p-6 bg-[#0c0c0e] flex-grow">
@@ -106,7 +106,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
           <div className="bg-suno-card border border-white/10 rounded-xl overflow-hidden shadow-lg h-full">
             <div className="bg-white/5 px-6 py-3 border-b border-white/10 flex items-center gap-2 text-blue-400">
               <Info className="w-4 h-4" />
-              <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Architect Analysis</h3>
+              <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Analiza Arhitectului</h3>
             </div>
             <div className="p-6">
               <p className="text-white/70 text-sm leading-relaxed">
@@ -116,9 +116,9 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ data }) => {
           </div>
           
           <div className="bg-gradient-to-br from-suno-primary/20 to-suno-secondary/20 border border-white/5 rounded-xl p-6">
-            <h4 className="text-white font-bold mb-2 text-sm">Pro Tip</h4>
+            <h4 className="text-white font-bold mb-2 text-sm">Sfat Pro</h4>
             <p className="text-xs text-white/60">
-              Paste the "Style Prompt" into the Style field in Suno Custom Mode. Paste the lyrics into the Lyrics field. If the song cuts off, use the "Extend" feature from the Outro.
+              Lipește "Prompt-ul de Stil" în câmpul Style din Suno Custom Mode. Lipește versurile în câmpul Lyrics. Dacă melodia se oprește brusc, folosește funcția "Extend" de la Outro.
             </p>
           </div>
         </div>

@@ -16,14 +16,14 @@ const App: React.FC = () => {
     setLoadingState(LoadingState.LOADING);
     setError(null);
     setResult(null);
-    setLastInput(input); // Save input for retry capability
+    setLastInput(input);
 
     try {
       const data = await generateBlueprint(input);
       setResult(data);
       setLoadingState(LoadingState.SUCCESS);
     } catch (err: any) {
-      setError(err.message || "Something went wrong while generating the blueprint.");
+      setError(err.message || "Ceva a mers prost în timpul generării blueprint-ului.");
       setLoadingState(LoadingState.ERROR);
     }
   };
@@ -41,9 +41,9 @@ const App: React.FC = () => {
       <main className="flex-grow container mx-auto px-4 py-8 space-y-12">
         <section className="flex flex-col items-center justify-center space-y-6">
           <div className="text-center max-w-xl space-y-2">
-            <h2 className="text-2xl font-bold text-white">Design Your Sound</h2>
+            <h2 className="text-2xl font-bold text-white">Creează-ți Sunetul</h2>
             <p className="text-white/50">
-              Input your concept below. The AI Architect will engineer the optimal Suno prompts and lyrical structure for professional-grade generation.
+              Introdu conceptul tău mai jos. AI Arhitectul va construi prompt-urile Suno optime și structura lirică pentru o generare de calitate profesională.
             </p>
           </div>
           
@@ -65,7 +65,7 @@ const App: React.FC = () => {
                 className="flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
               >
                 <RefreshCw className="w-4 h-4" />
-                Coba Lagi
+                Încearcă din nou
               </button>
             )}
           </div>
@@ -75,7 +75,7 @@ const App: React.FC = () => {
           <section className="border-t border-white/5 pt-12">
              <div className="flex items-center justify-center mb-8">
               <span className="bg-[#09090b] px-4 text-sm font-mono text-white/40 uppercase tracking-widest">
-                Blueprint Generated
+                Blueprint Generat
               </span>
              </div>
             <ResultDisplay data={result} />
@@ -84,8 +84,8 @@ const App: React.FC = () => {
       </main>
 
       <footer className="text-center py-8 text-white/20 text-xs">
-        <p>Use generated outputs with Suno AI Custom Mode.</p>
-        <p className="mt-1">© {new Date().getFullYear()} Suno AI Architect</p>
+        <p>Folosește rezultatele generate în modul Custom al Suno AI.</p>
+        <p className="mt-1">© {new Date().getFullYear()} Suno AI Arhitect</p>
       </footer>
     </div>
   );

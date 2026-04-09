@@ -12,67 +12,44 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
   const [formData, setFormData] = useState<UserInput>({
     genre: '',
     mood: '',
-    vocals: 'Male Vocal',
-    language: 'English',
-    tempo: 'Mid-Tempo (90-110 BPM)',
-    instruments: [], // Initialize instruments array
+    vocals: 'Voce Masculină',
+    language: 'Română',
+    tempo: 'Mid-Tempo / Pop (100-115 BPM)',
+    instruments: [],
     additionalDetails: '',
-    productionTexture: 'Warm Analog (Anti-Metallic)',
-    structure: '', // Default to empty (Auto)
+    productionTexture: 'Studio Modern (Hi-Fi, Curat)',
+    structure: '',
     isEarworm: false,
-    isHumanize: true, 
+    isHumanize: true,
     isMelodyGuide: false,
     isHarmony: false
   });
   
-  // Audio State
   const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Instrument Input State
   const [instrumentInput, setInstrumentInput] = useState('');
-
-  // Preset & History State
   const [presets, setPresets] = useState<Preset[]>([]);
   const [recents, setRecents] = useState<Preset[]>([]);
   const [isSavingPreset, setIsSavingPreset] = useState(false);
   const [newPresetName, setNewPresetName] = useState('');
   const [selectedPresetId, setSelectedPresetId] = useState<string>("");
 
-  // Load presets and history from localStorage on mount
   useEffect(() => {
     const savedPresets = localStorage.getItem('suno_architect_presets');
     if (savedPresets) {
-      try {
-        setPresets(JSON.parse(savedPresets));
-      } catch (e) {
-        console.error("Failed to parse presets", e);
-      }
+      try { setPresets(JSON.parse(savedPresets)); } catch (e) {}
     }
-    
     const savedRecents = localStorage.getItem('suno_architect_recents');
     if (savedRecents) {
-      try {
-        setRecents(JSON.parse(savedRecents));
-      } catch (e) {
-        console.error("Failed to parse recent history", e);
-      }
+      try { setRecents(JSON.parse(savedRecents)); } catch (e) {}
     }
   }, []);
 
   const addToRecents = (data: UserInput) => {
     const { audioData, audioMimeType, ...dataToSave } = data;
-    // Generate a name for the recent item
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const name = `${data.genre || 'No Genre'} • ${data.mood || 'No Mood'} (${timestamp})`;
-    
-    const newRecent: Preset = {
-      id: `recent-${Date.now()}`,
-      name: name,
-      data: dataToSave
-    };
-
-    // Keep last 5, prevent exact duplicates at the top if needed (optional, keeping simple FIFO here)
+    const name = `${data.genre || 'Fără Gen'} • ${data.mood || 'Fără Mood'} (${timestamp})`;
+    const newRecent: Preset = { id: `recent-${Date.now()}`, name, data: dataToSave };
     const updatedRecents = [newRecent, ...recents].slice(0, 5);
     setRecents(updatedRecents);
     localStorage.setItem('suno_architect_recents', JSON.stringify(updatedRecents));
@@ -80,20 +57,11 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
 
   const handleSavePreset = () => {
     if (!newPresetName.trim()) return;
-    
-    // Create preset object (excluding large audio data)
     const { audioData, audioMimeType, ...dataToSave } = formData;
-    
-    const newPreset: Preset = {
-      id: Date.now().toString(),
-      name: newPresetName.trim(),
-      data: dataToSave
-    };
-
+    const newPreset: Preset = { id: Date.now().toString(), name: newPresetName.trim(), data: dataToSave };
     const updatedPresets = [...presets, newPreset];
     setPresets(updatedPresets);
     localStorage.setItem('suno_architect_presets', JSON.stringify(updatedPresets));
-    
     setIsSavingPreset(false);
     setNewPresetName('');
     setSelectedPresetId(newPreset.id);
@@ -102,30 +70,21 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
   const handleLoadPreset = (id: string) => {
     setSelectedPresetId(id);
     if (!id) return;
-
-    // Check Saved Presets
     let preset = presets.find(p => p.id === id);
-    
-    // Check Recent History if not found
-    if (!preset) {
-      preset = recents.find(p => p.id === id);
-    }
-
+    if (!preset) preset = recents.find(p => p.id === id);
     if (preset) {
-      // Preserve current audio data if exists, overwrite other fields
       setFormData(prev => ({
         ...prev,
         ...preset!.data,
-        instruments: preset!.data.instruments || [], // Fallback for legacy presets
-        audioData: prev.audioData, // Keep existing audio
-        audioMimeType: prev.audioMimeType // Keep existing audio
+        instruments: preset!.data.instruments || [],
+        audioData: prev.audioData,
+        audioMimeType: prev.audioMimeType
       }));
     }
   };
 
   const handleDeletePreset = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    // Only delete from Saved Presets
     if (presets.some(p => p.id === id)) {
       const updatedPresets = presets.filter(p => p.id !== id);
       setPresets(updatedPresets);
@@ -143,7 +102,6 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
     setFormData(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
-  // Instrument Tag Logic
   const handleInstrumentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
@@ -153,7 +111,6 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
         setInstrumentInput('');
       }
     } else if (e.key === 'Backspace' && !instrumentInput && formData.instruments.length > 0) {
-      // Remove last tag on backspace if input is empty
       setFormData(prev => ({ ...prev, instruments: prev.instruments.slice(0, -1) }));
     }
   };
@@ -165,11 +122,10 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        alert("File size too large. Please upload an MP3 under 10MB.");
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Fișierul este prea mare. Te rugăm să încarci un MP3 sub 10MB.");
         return;
       }
-      
       const reader = new FileReader();
       reader.onload = (event) => {
         const base64String = (event.target?.result as string).split(',')[1];
@@ -177,10 +133,9 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
           ...prev,
           audioData: base64String,
           audioMimeType: file.type,
-          // Auto-detect triggers
-          vocals: '✨ Auto-detect (Match Audio)',
-          tempo: '✨ Auto-detect (Match Audio)',
-          language: '✨ Auto-detect (Match Audio)'
+          vocals: '✨ Auto-detectare (Potrivire Audio)',
+          tempo: '✨ Auto-detectare (Potrivire Audio)',
+          language: '✨ Auto-detectare (Potrivire Audio)'
         }));
         setFileName(file.name);
       };
@@ -189,28 +144,27 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
   };
 
   const clearFile = () => {
-    setFormData(prev => ({ 
-      ...prev, 
-      audioData: undefined, 
+    setFormData(prev => ({
+      ...prev,
+      audioData: undefined,
       audioMimeType: undefined,
-      // Reset to defaults if file is removed
-      vocals: 'Male Vocal',
-      tempo: 'Mid-Tempo (90-110 BPM)',
-      language: 'English'
+      vocals: 'Voce Masculină',
+      tempo: 'Mid-Tempo / Pop (100-115 BPM)',
+      language: 'Română'
     }));
     setFileName(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleLanguageFocus = () => {
-    if (formData.language.includes('Auto-detect')) {
+    if (formData.language.includes('Auto-detectare')) {
       setFormData(prev => ({ ...prev, language: '' }));
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    addToRecents(formData); // Save to history
+    addToRecents(formData);
     onSubmit(formData);
   };
 
@@ -223,29 +177,23 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
       <div className="bg-white/5 rounded-xl p-4 border border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-white/70 w-full md:w-auto">
           <Bookmark className="w-4 h-4 text-suno-primary" />
-          <span className="text-sm font-mono uppercase tracking-wider">Presets</span>
+          <span className="text-sm font-mono uppercase tracking-wider">Preseturi</span>
         </div>
 
         {isSavingPreset ? (
           <div className="flex items-center gap-2 w-full md:w-auto animate-in fade-in slide-in-from-right-4 duration-300">
             <input
               type="text"
-              placeholder="Preset Name..."
+              placeholder="Nume Preset..."
               value={newPresetName}
               onChange={(e) => setNewPresetName(e.target.value)}
               className="bg-black/40 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-suno-primary w-full md:w-48"
               autoFocus
             />
-            <button 
-              onClick={handleSavePreset}
-              className="p-1.5 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-lg transition-colors"
-            >
+            <button onClick={handleSavePreset} className="p-1.5 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-lg transition-colors">
               <Check className="w-4 h-4" />
             </button>
-            <button 
-              onClick={() => setIsSavingPreset(false)}
-              className="p-1.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors"
-            >
+            <button onClick={() => setIsSavingPreset(false)} className="p-1.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -257,47 +205,37 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
                 onChange={(e) => handleLoadPreset(e.target.value)}
                 className="w-full bg-black/40 border border-white/10 rounded-lg pl-3 pr-8 py-2 text-sm text-white focus:outline-none focus:border-white/30 appearance-none cursor-pointer hover:bg-white/5 transition-colors"
               >
-                <option value="">Load a preset...</option>
-                
+                <option value="">Încarcă un preset...</option>
                 {presets.length > 0 && (
-                  <optgroup label="Saved Presets">
-                    {presets.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
+                  <optgroup label="Preseturi Salvate">
+                    {presets.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </optgroup>
                 )}
-                
                 {recents.length > 0 && (
-                  <optgroup label="Recently Used">
-                    {recents.map(p => (
-                      <option key={p.id} value={p.id}>History: {p.name}</option>
-                    ))}
+                  <optgroup label="Utilizate Recent">
+                    {recents.map(p => <option key={p.id} value={p.id}>Istoric: {p.name}</option>)}
                   </optgroup>
                 )}
               </select>
-              
-              {/* Only show delete for Saved Presets */}
               {selectedPresetId && !selectedPresetId.startsWith('recent-') && (
-                 <button
-                 onClick={(e) => handleDeletePreset(e, selectedPresetId)}
-                 className="absolute right-8 top-1/2 -translate-y-1/2 p-1 text-white/30 hover:text-red-400 transition-colors"
-                 title="Delete Preset"
-               >
-                 <Trash2 className="w-3 h-3" />
-               </button>
+                <button
+                  onClick={(e) => handleDeletePreset(e, selectedPresetId)}
+                  className="absolute right-8 top-1/2 -translate-y-1/2 p-1 text-white/30 hover:text-red-400 transition-colors"
+                  title="Șterge Preset"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
               )}
-              
               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                 <svg className="w-3 h-3 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </div>
-
             <button
               onClick={() => setIsSavingPreset(true)}
               className="flex items-center gap-2 px-3 py-2 bg-suno-primary/20 hover:bg-suno-primary/30 text-suno-primary border border-suno-primary/30 rounded-lg text-sm transition-all"
             >
               <Save className="w-4 h-4" />
-              <span className="hidden sm:inline">Save</span>
+              <span className="hidden sm:inline">Salvează</span>
             </button>
           </div>
         )}
@@ -308,17 +246,17 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
         {/* Audio Reference Upload */}
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-wider text-white/50">
-            Audio Reference (Optional)
+            Referință Audio (Opțional)
           </label>
           <div className="relative group">
             {!fileName ? (
-              <div 
+              <div
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-suno-primary/50 hover:bg-white/5 transition-all"
               >
                 <UploadCloud className="w-8 h-8 text-suno-primary/70" />
-                <p className="text-sm text-white/60">Click to upload MP3 reference</p>
-                <p className="text-xs text-white/30">AI will auto-detect Genre, Vocals & Tempo</p>
+                <p className="text-sm text-white/60">Click pentru a încărca un MP3 de referință</p>
+                <p className="text-xs text-white/30">AI-ul va auto-detecta Gen, Voce & Tempo</p>
               </div>
             ) : (
               <div className="w-full bg-suno-primary/10 border border-suno-primary/30 rounded-xl p-4 flex items-center justify-between">
@@ -328,25 +266,15 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className="text-sm font-medium text-white truncate max-w-[200px] md:max-w-xs">{fileName}</span>
-                    <span className="text-xs text-white/50">Reference Loaded • Auto-detect Active</span>
+                    <span className="text-xs text-white/50">Referință Încărcată • Auto-detectare Activă</span>
                   </div>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={clearFile}
-                  className="p-2 hover:bg-red-500/20 rounded-lg text-white/50 hover:text-red-400 transition-colors"
-                >
+                <button type="button" onClick={clearFile} className="p-2 hover:bg-red-500/20 rounded-lg text-white/50 hover:text-red-400 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             )}
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              accept="audio/mp3,audio/wav,audio/mpeg" 
-              onChange={handleFileChange}
-              className="hidden" 
-            />
+            <input type="file" ref={fileInputRef} accept="audio/mp3,audio/wav,audio/mpeg" onChange={handleFileChange} className="hidden" />
           </div>
         </div>
 
@@ -355,14 +283,14 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
         {/* Genre & Mood Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Genre / Style</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Gen / Stil Muzical</label>
             <input
               type="text"
               name="genre"
               list="genre-suggestions"
               value={formData.genre}
               onChange={handleChange}
-              placeholder={fileName ? "Auto-detected from audio" : "e.g. Synthwave"}
+              placeholder={fileName ? "Auto-detectat din audio" : "ex. Manele, Folk Românesc"}
               className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-suno-primary focus:ring-1 focus:ring-suno-primary transition-all placeholder:text-white/20"
             />
             <datalist id="genre-suggestions">
@@ -371,13 +299,13 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Mood / Vibe</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Mood / Atmosferă</label>
             <input
               type="text"
               name="mood"
               value={formData.mood}
               onChange={handleChange}
-              placeholder={fileName ? "Auto-detected from audio" : "e.g. Melancholic, High Energy"}
+              placeholder={fileName ? "Auto-detectat din audio" : "ex. Melancolic, Vesel, Nostalgic"}
               className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-suno-secondary focus:ring-1 focus:ring-suno-secondary transition-all placeholder:text-white/20"
             />
           </div>
@@ -386,7 +314,7 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
         {/* Vocals, Language, Tempo Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Vocals</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Voce</label>
             <select
               name="vocals"
               value={formData.vocals}
@@ -410,34 +338,30 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Language</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-white/50">Limbă</label>
             <input
               type="text"
               name="language"
               value={formData.language}
               onChange={handleChange}
               onFocus={handleLanguageFocus}
-              placeholder={fileName ? "Auto-detected" : "e.g. English"}
+              placeholder={fileName ? "Auto-detectată" : "ex. Română"}
               className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-suno-primary"
             />
           </div>
         </div>
 
-        {/* Specific Instruments Input (Tag Style) */}
+        {/* Specific Instruments Input */}
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-wider text-white/50 flex items-center gap-2">
-             <Guitar className="w-3 h-3 text-orange-400" />
-             Specific Instruments
+            <Guitar className="w-3 h-3 text-orange-400" />
+            Instrumente Specifice
           </label>
           <div className="w-full bg-black/20 border border-white/10 rounded-lg px-2 py-2 flex flex-wrap gap-2 items-center focus-within:border-suno-primary focus-within:ring-1 focus-within:ring-suno-primary transition-all">
             {formData.instruments.map((inst) => (
               <span key={inst} className="bg-suno-primary/20 border border-suno-primary/30 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 animate-in fade-in zoom-in duration-200">
                 {inst}
-                <button 
-                  type="button" 
-                  onClick={() => removeInstrument(inst)}
-                  className="text-white/50 hover:text-white transition-colors"
-                >
+                <button type="button" onClick={() => removeInstrument(inst)} className="text-white/50 hover:text-white transition-colors">
                   <X size={12} />
                 </button>
               </span>
@@ -447,7 +371,7 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
               value={instrumentInput}
               onChange={(e) => setInstrumentInput(e.target.value)}
               onKeyDown={handleInstrumentKeyDown}
-              placeholder={formData.instruments.length === 0 ? "Type instrument & press Enter (e.g. Saxophone)..." : "Add another..."}
+              placeholder={formData.instruments.length === 0 ? "Scrie instrument & apasă Enter (ex. Nai, Vioară)..." : "Adaugă altul..."}
               className="bg-transparent outline-none flex-grow text-white placeholder:text-white/20 min-w-[150px] px-2 py-1"
             />
           </div>
@@ -456,8 +380,8 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
         {/* Structure Blueprint Dropdown */}
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-wider text-white/50 flex items-center gap-2">
-             <Layers className="w-3 h-3 text-purple-400" />
-             Structure Blueprint
+            <Layers className="w-3 h-3 text-purple-400" />
+            Structura Blueprint
           </label>
           <div className="relative">
             <select
@@ -467,7 +391,7 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
               className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 appearance-none cursor-pointer transition-all hover:bg-black/30"
             >
               <option value="">
-                {fileName ? "✨ Auto-detect from Audio Reference" : "✨ Auto / AI Decision"}
+                {fileName ? "✨ Auto-detectare din Referința Audio" : "✨ Auto / Decizia AI"}
               </option>
               {STRUCTURE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
@@ -479,13 +403,13 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
 
         {/* Additional Details */}
         <div className="space-y-2">
-          <label className="text-xs font-mono uppercase tracking-wider text-white/50">Story / Theme / Other Details</label>
+          <label className="text-xs font-mono uppercase tracking-wider text-white/50">Poveste / Temă / Alte Detalii</label>
           <textarea
             name="additionalDetails"
             value={formData.additionalDetails}
             onChange={handleChange}
             rows={3}
-            placeholder="A song about a robot falling in love with a toaster..."
+            placeholder="O melodie despre dorul de casă, despre iubire pierdută, despre petrecere la sat..."
             className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-suno-primary resize-none"
           />
         </div>
@@ -493,8 +417,8 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
         {/* Production Texture Selection */}
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-wider text-white/50 flex items-center gap-2">
-             <AudioLines className="w-3 h-3 text-blue-400" />
-             Production Texture (Anti-Artifacts)
+            <AudioLines className="w-3 h-3 text-blue-400" />
+            Textură de Producție (Anti-Artefacte)
           </label>
           <div className="relative">
             <select
@@ -513,23 +437,18 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
 
         {/* Advanced Toggles */}
         <div className="space-y-3 pt-2">
-          <label className="text-xs font-mono uppercase tracking-wider text-white/50">Advanced Mode</label>
+          <label className="text-xs font-mono uppercase tracking-wider text-white/50">Mod Avansat</label>
           
           {/* Earworm Mode */}
-          <div 
+          <div
             onClick={() => handleToggle('isEarworm')}
-            className={`
-              w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300
-              ${formData.isEarworm 
-                ? 'bg-[#3A2410] border-orange-500/50' 
-                : 'bg-black/20 border-white/10 hover:border-white/20'}
-            `}
+            className={`w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300 ${formData.isEarworm ? 'bg-[#3A2410] border-orange-500/50' : 'bg-black/20 border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center gap-3">
               <Star className={`w-5 h-5 ${formData.isEarworm ? 'text-orange-400 fill-orange-400' : 'text-white/40'}`} />
               <div>
-                <h3 className={`font-bold text-sm ${formData.isEarworm ? 'text-orange-100' : 'text-white'}`}>Earworm Mode</h3>
-                <p className="text-xs text-white/50">Repetitive & catchy hooks</p>
+                <h3 className={`font-bold text-sm ${formData.isEarworm ? 'text-orange-100' : 'text-white'}`}>Mod Earworm</h3>
+                <p className="text-xs text-white/50">Refren scurt, repetitiv și extrem de memorabil</p>
               </div>
             </div>
             <div className={`w-11 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${formData.isEarworm ? 'bg-orange-500' : 'bg-gray-700'}`}>
@@ -538,20 +457,15 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
           </div>
 
           {/* Humanize Vocals */}
-          <div 
+          <div
             onClick={() => handleToggle('isHumanize')}
-            className={`
-              w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300
-              ${formData.isHumanize 
-                ? 'bg-[#10243A] border-blue-500/50' 
-                : 'bg-black/20 border-white/10 hover:border-white/20'}
-            `}
+            className={`w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300 ${formData.isHumanize ? 'bg-[#10243A] border-blue-500/50' : 'bg-black/20 border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center gap-3">
               <User className={`w-5 h-5 ${formData.isHumanize ? 'text-blue-400' : 'text-white/40'}`} />
               <div>
-                <h3 className={`font-bold text-sm ${formData.isHumanize ? 'text-blue-100' : 'text-white'}`}>Humanize Vocals</h3>
-                <p className="text-xs text-white/50">Injects breaths & imperfections</p>
+                <h3 className={`font-bold text-sm ${formData.isHumanize ? 'text-blue-100' : 'text-white'}`}>Umanizare Vocală</h3>
+                <p className="text-xs text-white/50">Injectează respirații & imperfecțiuni naturale</p>
               </div>
             </div>
             <div className={`w-11 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${formData.isHumanize ? 'bg-blue-500' : 'bg-gray-700'}`}>
@@ -560,20 +474,15 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
           </div>
 
           {/* Melody Guide */}
-          <div 
+          <div
             onClick={() => handleToggle('isMelodyGuide')}
-            className={`
-              w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300
-              ${formData.isMelodyGuide 
-                ? 'bg-[#2D103A] border-purple-500/50' 
-                : 'bg-black/20 border-white/10 hover:border-white/20'}
-            `}
+            className={`w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300 ${formData.isMelodyGuide ? 'bg-[#2D103A] border-purple-500/50' : 'bg-black/20 border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center gap-3">
               <TrendingUp className={`w-5 h-5 ${formData.isMelodyGuide ? 'text-purple-400' : 'text-white/40'}`} />
               <div>
-                <h3 className={`font-bold text-sm ${formData.isMelodyGuide ? 'text-purple-100' : 'text-white'}`}>Melody Guide</h3>
-                <p className="text-xs text-white/50">Insert melodic contour cues</p>
+                <h3 className={`font-bold text-sm ${formData.isMelodyGuide ? 'text-purple-100' : 'text-white'}`}>Ghid de Melodie</h3>
+                <p className="text-xs text-white/50">Inserează indicații de contur melodic în versuri</p>
               </div>
             </div>
             <div className={`w-11 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${formData.isMelodyGuide ? 'bg-purple-500' : 'bg-gray-700'}`}>
@@ -582,27 +491,21 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
           </div>
 
           {/* Vocal Harmony */}
-          <div 
+          <div
             onClick={() => handleToggle('isHarmony')}
-            className={`
-              w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300
-              ${formData.isHarmony 
-                ? 'bg-[#3A1024] border-pink-500/50' 
-                : 'bg-black/20 border-white/10 hover:border-white/20'}
-            `}
+            className={`w-full p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300 ${formData.isHarmony ? 'bg-[#3A1024] border-pink-500/50' : 'bg-black/20 border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center gap-3">
               <Mic2 className={`w-5 h-5 ${formData.isHarmony ? 'text-pink-400' : 'text-white/40'}`} />
               <div>
-                <h3 className={`font-bold text-sm ${formData.isHarmony ? 'text-pink-100' : 'text-white'}`}>Vocal Harmony</h3>
-                <p className="text-xs text-white/50">Add backing vocals & layers</p>
+                <h3 className={`font-bold text-sm ${formData.isHarmony ? 'text-pink-100' : 'text-white'}`}>Armonii Vocale</h3>
+                <p className="text-xs text-white/50">Adaugă voci de fundal & straturi armonice</p>
               </div>
             </div>
             <div className={`w-11 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${formData.isHarmony ? 'bg-pink-500' : 'bg-gray-700'}`}>
               <div className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${formData.isHarmony ? 'translate-x-5' : ''}`}></div>
             </div>
           </div>
-
         </div>
 
         {/* Submit Button */}
@@ -615,12 +518,12 @@ const BlueprintForm: React.FC<BlueprintFormProps> = ({ onSubmit, loadingState })
             {isLoading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin text-white" />
-                <span className="font-semibold text-white tracking-wide">Architecting...</span>
+                <span className="font-semibold text-white tracking-wide">Se generează...</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 text-yellow-300" />
-                <span className="font-semibold text-white tracking-wide">Generate Blueprint</span>
+                <span className="font-semibold text-white tracking-wide">Generează Blueprint</span>
               </>
             )}
           </div>

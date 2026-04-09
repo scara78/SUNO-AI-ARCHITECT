@@ -1,54 +1,65 @@
 export const VOCAL_TYPES = [
-  "✨ Auto-detect (Match Audio)",
-  "Male Vocal",
-  "Female Vocal",
-  "Duet",
-  "Choir",
-  "Instrumental (No Vocals)",
-  "Spoken Word",
-  "Screaming/Growling",
-  "Auto-tuned Pop",
-  "Ethereal Soprano"
+  "✨ Auto-detectare (Potrivire Audio)",
+  "Voce Masculină",
+  "Voce Feminină",
+  "Duet Bărbat-Femeie",
+  "Cor",
+  "Instrumental (Fără Voce)",
+  "Voce de Tenor (Populară)",
+  "Voce de Soprană (Populară)",
+  "Voce Lăutărească (Vibrato Intensiv)",
+  "Voce Rap / Hip-Hop",
+  "Voce Auto-tuned (Manele Moderne)"
 ];
 
 export const GENRE_EXAMPLES = [
-  "Cyberpunk Synthwave",
-  "Lo-fi Hip Hop",
-  "Orchestral Cinematic",
-  "Modern Metalcore",
-  "Indie Folk",
-  "K-Pop",
-  "Techno Rumble",
-  "Jazz Fusion",
-  "Reggaeton"
+  "Manele Moderne",
+  "Manele Clasice (Lăutărești)",
+  "Pop Românesc",
+  "Folk Românesc (Muzică Populară)",
+  "Muzică Populară Ardeleană",
+  "Muzică Populară Moldovenească",
+  "Muzică Populară Oltenească",
+  "Doină",
+  "Muzică de Petrecere",
+  "Muzică Lăutărească",
+  "Rock Românesc",
+  "Hip-Hop Românesc",
+  "Dance / Eurodance Românesc",
+  "Balada Românească",
+  "Muzică Etno-Pop",
+  "Colinde Românești"
 ];
 
 export const TEMPO_OPTIONS = [
-  "✨ Auto-detect (Match Audio)",
-  "Slow (60-80 BPM)",
-  "Mid-Tempo (90-110 BPM)",
-  "Upbeat (120-130 BPM)",
-  "Fast (140-160 BPM)",
-  "Very Fast (170+ BPM)"
+  "✨ Auto-detectare (Potrivire Audio)",
+  "Lent / Doină (50-70 BPM)",
+  "Moderat / Baladă (75-95 BPM)",
+  "Mid-Tempo / Pop (100-115 BPM)",
+  "Vioi / Petrecere (120-135 BPM)",
+  "Rapid / Dans (140-160 BPM)",
+  "Foarte Rapid / Hore (165+ BPM)"
 ];
 
 export const PRODUCTION_TEXTURES = [
-  "Warm Analog (Anti-Metallic)",
-  "Modern Studio (Hi-Fi)",
-  "Live Recording (Natural Acoustics)",
-  "Lo-fi Organic (Raw & Dusty)"
+  "Lăutăresc Autentic (Acustic Cald, Viori, Nai)",
+  "Studio Modern (Hi-Fi, Curat)",
+  "Pop Romantic (Orchestral + Sintetizatoare)",
+  "Manele Moderne (Sintetizatoare Orient + Beat Electronic)",
+  "Folk Organic (Înregistrare Naturală, Instrumente Tradiționale)",
+  "Lo-fi Retro (Analog, Anilor '80-'90)"
 ];
 
 export const STRUCTURE_OPTIONS = [
-  "Intro - Verse - Chorus - Verse - Chorus - Bridge - Chorus - Outro (The Standard)",
-  "Intro - Verse - Pre-Chorus - Chorus - Verse - Pre-Chorus - Chorus - Bridge - Chorus - Outro (Full Pop)",
-  "Chorus - Verse - Chorus - Verse - Chorus - Outro (Hook First / Viral)",
-  "Intro - Build-up - Drop - Verse - Build-up - Drop - Outro (EDM / Festival)",
-  "Intro - Verse - Chorus - Verse - Chorus - Solo - Chorus - Outro (Rock Radio)",
-  "Intro - Verse - Hook - Verse - Hook - Bridge - Hook - Outro (Hip-Hop / Trap)",
-  "Intro - Verse - Chorus - Post-Chorus - Verse - Chorus - Post-Chorus - Outro (Modern Pop / K-Pop)",
-  "Intro - Verse - Verse - Bridge - Verse - Outro (Folk / Storyteller)",
-  "Intro - Verse - Chorus - Verse - Chorus - Outro (Short & Sweet)",
-  "Ambient Intro - Verse - Chorus - Ambient Bridge - Chorus - Outro (Atmospheric)",
-  "Intro - Build - Drop - Break - Build - Drop - Outro"
+  "Intro - Vers - Refren - Vers - Refren - Bridge - Refren - Outro (Standard)",
+  "Intro - Vers - Pre-Refren - Refren - Vers - Pre-Refren - Refren - Bridge - Refren - Outro (Pop Complet)",
+  "Refren - Vers - Refren - Vers - Refren - Outro (Hook Primul / Viral)",
+  "Intro - Vers - Refren - Strofă - Refren - Outro (Baladă Românească)",
+  "Intro - Vers - Vers - Bridge - Vers - Outro (Folk / Doină / Povestitor)",
+  "Intro - Vers - Refren - Vers - Refren - Solo Instrumental - Refren - Outro (Rock / Lăutăresc)",
+  "Intro - Build - Drop - Vers - Build - Drop - Outro (Dance / EDM Românesc)",
+  "Intro - Vers - Hook - Vers - Hook - Bridge - Hook - Outro (Hip-Hop / Trap Românesc)",
+  "Intro - Vers - Refren - Post-Refren - Vers - Refren - Post-Refren - Outro (Pop Modern)",
+  "Intro - Vers - Refren - Vers - Refren - Outro (Scurt & Concis)",
+  "Intro - Strofă - Refren - Strofă - Refren - Modulație - Refren Final - Outro (Manele Clasice)"
 ];

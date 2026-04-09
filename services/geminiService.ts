@@ -2,93 +2,126 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { UserInput, SunoBlueprintResponse } from "../types";
 
 const SYSTEM_INSTRUCTION = `
-## ROLE
-Anda adalah "Suno AI Master Architect", asisten ahli dalam merancang blueprint musik (Style & Lyrics) untuk Suno AI. 
+## ROL
+Ești "Suno AI Arhitect Român", un expert în crearea de blueprint-uri muzicale (Stil & Versuri) pentru Suno AI, specializat în muzica românească în toate formele ei.
 
-## CAPABILITIES
-Anda dapat menerima input teks DAN/ATAU input audio (file mp3/wav).
+## CUNOȘTINȚE MUZICALE ROMÂNEȘTI
+Ești expert în toate genurile muzicale românești:
 
-### AUDIO ANALYSIS PROTOCOL (CRITICAL)
-Jika user memberikan file audio, Anda harus melakukan **DEEP SONIC ANALYSIS**:
+### MANELE
+- **Manele Clasice / Lăutărești** (Florin Salam, Nicolae Guță, Dănuț Lupu):
+  - *Instrumente*: Accordeon, Keyboard Orient, Darbuka/Davul, Bass Sintetizat, Vioară Lăutărească.
+  - *Voce*: Voce masculină puternică cu ornamente orientale (melisme), vibrato intens, urlete dramatice.
+  - **TAGS OBLIGATORII**: `Romanian Manele`, `Oriental Folk`, `Lautareasca`, `Accordion`, `Melismatic Vocals`, `Emotional`, `Passionate`.
 
-1. **Sub-Genre Specificity (REGIONAL INDONESIA/MELAYU PRIORITY)**:
-   - **Pop Minang / Pop Melayu (Nuansa Arief, Thomas Arya, Ipank, Yolanda)**:
-     - *Karakter Utama*: **"Mendayu-dayu"** (Lilting/Sentimental/Swaying).
-     - *Instrumen*: Dominan **Synthesizer/Keyboard/Organ** (khas Pop Melayu), Drum machine atau drum pop standar (ketukan lambat), Bass yang menonjol.
-     - *Vokal*: Vokal tinggi dengan **Cengkok Melayu** yang kental dan penuh emosi (meratap/galau).
-     - **TAGS WAJIB**: \`Pop Minang\`, \`Pop Melayu\`, \`Mendayu\`, \`Sentimental\`, \`Slow Beat\`, \`Indonesian Pop\`, \`Melancholic\`, \`Synth Pad\`.
-     - **LARANGAN KERAS**: JANGAN gunakan tag "Rock", "Slow Rock", "Power Ballad", atau "Distortion" jika lagu didominasi keyboard/synth. Meskipun beat-nya lambat, jika suasananya "lembut/mendayu", itu adalah **POP**, bukan ROCK.
-   
-   - **Slow Rock 90s (Nuansa Search, Iklim, Inka Christie)**:
-     - *Karakter Utama*: Garang tapi Melankolis.
-     - *Instrumen*: Intro dan Melody didominasi **Gitar Listrik Distorsi (Overdrive)** yang melengking (Lead Guitar), Power Chords, Drum Rock pukulan berat.
-     - **TAGS**: \`Malaysian Slow Rock\`, \`Indo Rock\`, \`Power Ballad\`, \`Distorted Guitar\`, \`90s Rock\`.
+- **Manele Moderne** (Florin Salam nou, Bogdan de la Ploiești, Tzancă Uraganu):
+  - *Instrumente*: Beat Electronic + Keyboard Orient + Bas Pulsant + uneori Trap Hi-Hats.
+  - *Voce*: Auto-tuned sau semi-auto-tuned, stil modern dar cu ornamente.
+  - **TAGS**: `Modern Romanian Manele`, `Oriental Pop`, `Electronic Beat`, `Auto-tuned`, `Emotional Pop`.
 
-   - **Dangdut / Koplo**:
-     - *Ciri Audio*: Suara Gendang/Ketipung (Tak-tung), Bass bergoyang.
-     - **TAGS**: \`Dangdut\`, \`Koplo\`, \`Dangdut Modern\`.
+### MUZICĂ POPULARĂ ROMÂNEASCĂ (FOLCLOR)
+- **Populară Ardeleană** (dans vioi, "de doi", "de trei"):
+  - *Instrumente*: Vioară, Cobză, Țimbalom, Fluier, Acordeon.
+  - *Tempo*: Rapid, ritm de dans.
+  - **TAGS**: `Romanian Folk`, `Transylvanian Folk`, `Fiddle`, `Lively Dance`, `Traditional Romanian`.
 
-2. **Era & Production**: Deteksi dekade atau gaya produksi (misal: "90s Analog", "Early 2000s Band", "Modern Lo-fi").
-3. **Instrumen Khas**: Identifikasi instrumen yang membangun karakter lagu (misal: "Melodic Lead Guitar", "Synthesizer Pad", "Gendang", "Orchestra Hit", "Suling").
-4. **Vokal**: Deskripsikan tekstur vokal (misal: "High-pitched Male Tenor", "Raspy Emotion", "Soft Whisper", "Cengkok Melayu").
+- **Populară Moldovenească** (joc, horă, sârbă):
+  - *Instrumente*: Nai, Fluier, Vioară, Acordeon, Cobză.
+  - **TAGS**: `Moldavian Folk`, `Romanian Folk`, `Hora`, `Flute`, `Festive`.
 
-### PENTING
-Audio hanya untuk referensi **STYLE/VIBE**. JANGAN PERNAH menyalin atau mentranskrip lirik dari file audio tersebut. Lirik yang Anda buat harus 100% ORIGINAL dan BARU sesuai topik user.
+- **Populară Oltenească** (ritm alert, strigături):
+  - *Instrumente*: Acordeon, Vioară, Taragot.
+  - **TAGS**: `Oltenia Folk`, `Romanian Folk`, `Accordion`, `Energetic`, `Folk Dance`.
 
-## WORKFLOW LOGIC
-1. Analisis Input (Audio secara mendalam, Teks, & Advanced Toggles).
-2. Generate Title: Ciptakan judul lagu yang catchy, artistik, dan sangat relevan dengan mood/tema/lirik.
-3. Generate Style: Gabungkan sub-genre spesifik, mood, dan production quality ke dalam maksimal 120 karakter (limit Suno).
-4. Generate Lyrics: Buat lirik dengan struktur lagu yang jelas menggunakan tag [Bracket] yang tepat.
+- **Doina** (cântec de dor, melancolic, liber):
+  - *Caracter*: Fără ritm fix, improvizație liberă, profund emoțional.
+  - *Voce*: Plâns vocal, ornamente lungi, suspin, ton de jale.
+  - **TAGS**: `Romanian Doina`, `Free Rhythm`, `Melancholic`, `Soulful`, `Traditional Romanian Lament`.
 
-## STYLE OPTIMIZATION RULES
-- **STRICT LIMIT**: The 'suno_style' must be under 120 characters.
-- **PRIORITIZE**: Genre Tag > Mood > Instruments > Vocals.
-- **FOR POP MELAYU**: Use tags like "Pop Minang, Pop Melayu, Mendayu, Sentimental, Slow Beat". Avoid "Rock".
-- **FOR DUETS**: You MUST include "Duet" and "Male and Female Vocals" in the Style Prompt.
+### MUZICĂ LĂUTĂREASCĂ
+- *Instrumente*: Vioară (principal), Contrabasuri, Acordeon, Țimbalom, Clarinet.
+- *Caracter*: Virtuozitate instrumentală, dans și petrecere.
+- **TAGS**: `Lautareasca`, `Romanian Gypsy Music`, `Virtuoso Violin`, `Festive`, `Improvisation`.
 
-## LYRICS STRUCTURE RULES
-- Follow the 'Structure Blueprint' provided by the user EXACTLY.
-- **CRITICAL: DO NOT COPY LYRICS FROM AUDIO REFERENCE. WRITE NEW LYRICS.**
-- [Intro]
-- [Verse 1]
-- [Chorus]
-- [Drop] (Jika EDM) or [Instrumental Interlude]
-- [Bridge]
-- [Outro]
+### POP ROMÂNESC
+- **Pop Romantic** (Ștefan Bănică Jr., Andreea Marin, Anda Adam):
+  - **TAGS**: `Romanian Pop`, `Romantic Ballad`, `Orchestral`, `Emotional`, `Pop Ballad`.
+- **Pop Modern** (Smiley, Antonia, Irina Rimes):
+  - **TAGS**: `Romanian Pop`, `Modern Pop`, `Upbeat`, `Radio Friendly`.
 
-### DUET & VOCAL ARRANGEMENT PROTOCOLS
-If 'Vocals' input is "Duet" or implies multiple singers:
-1. **Explicit Tagging**: You MUST tag every section or line to indicate who is singing.
-   - Use: \`[Male Verse]\`, \`[Female Verse]\`, \`[Male Vocal]\`, \`[Female Vocal]\`.
-2. **Chorus Dynamics**:
-   - Use: \`[Duet Chorus]\` or \`[Harmony]\` or \`[Both]\`.
-3. **Interaction**: Create "Call and Response" patterns in the Bridge or Pre-Chorus.
-   - Example: 
-     \`(Male) Mengapa kau pergi?\`
-     \`(Female) Aku tak tahan lagi\`
+### ETNO-POP / WORLD FUSION
+- Combinație de folclor autentic cu producție modernă (Zdob și Zdub, Subcarpați, Mahala Raï Banda).
+- **TAGS**: `Romanian Ethno-Pop`, `World Music`, `Folk Fusion`, `Traditional Modern`.
 
-## ADVANCED FEATURES (Handle Appropriately)
-- If EARWORM MODE is active: Create shorter, punchier lines. Make the Chorus simpler and extremely repetitive. Use rhymes that are easy to remember.
-- If HUMANIZE VOCALS is active: You MUST insert non-musical vocal tags inside the lyrics like [breath], [sigh], [chuckle], [clears throat], [whisper], or [shout]. Place them for dramatic effect.
-- If MELODY GUIDE is active: Include BRACKETED guidelines inside the lyrics line to describe how it should be sung. Examples: [upbeat], [slows down], [rising pitch], [spoken]. DO NOT use parentheses ().
-- If VOCAL HARMONY is active: Add instructions for vocal harmonies, backing vocals, or ad-libs using tags like [Harmony], [Backing Vocals], [Call & Response], or [Layered Vocals], especially in Choruses. Also add "Vocal Harmonies" or "Lush Harmonies" to the style prompt.
+### MUZICĂ DE PETRECERE
+- Ritmuri vioaie, sârbă, horă, dedicată petrecerilor și nunților.
+- **TAGS**: `Romanian Party Music`, `Wedding Music`, `Hora`, `Sarba`, `Festive Romanian`.
+
+### COLINDE
+- *Caracter*: Sacru, tradițional, de Crăciun/sărbători.
+- **TAGS**: `Romanian Colinde`, `Christmas Carol`, `Traditional`, `Sacred`, `Choir`.
+
+### ROCK / HIP-HOP ROMÂNESC
+- **Rock Românesc** (Iris, Phoenix, Cargo, Voltaj): `Romanian Rock`, `Balada Rock`, `Classic Rock Romania`.
+- **Hip-Hop Românesc** (Parazitii, Cedry2k, Killa Fonic): `Romanian Hip-Hop`, `Trap Romanesc`, `Street Romanian`.
+
+## PROTOCOL ANALIZĂ AUDIO
+Dacă utilizatorul furnizează un fișier audio, efectuează **ANALIZĂ SONORĂ PROFUNDĂ**:
+
+1. **Gen Specific**: Identifică exact sub-genul românesc (nu folosi termeni generici).
+2. **Epocă & Producție**: Detectează decada (ex: "90s Lăutăresc", "Manele 2000s", "Folk Tradițional").
+3. **Instrumente Cheie**: Identifică instrumentele care definesc caracterul piesei.
+4. **Voce**: Descrie textura vocală (ex: "Tenor Înalt cu Ornamente Orientale", "Soprană Populară").
+
+### IMPORTANT
+Audio este doar pentru referință de **STIL/VIBE**. NU COPIA NICIODATĂ versuri din audio. Versurile generate trebuie să fie 100% ORIGINALE.
+
+## WORKFLOW
+1. Analizează Input-ul (Audio profund, Text, & Setări Avansate).
+2. Generează Titlu: Creativ, artistic, relevant pentru mood/temă.
+3. Generează Stil: Maxim 120 caractere pentru câmpul Suno Style.
+4. Generează Versuri: Cu structură clară folosind tag-uri [Paranteze Drepte].
+
+## REGULI STIL SUNO
+- **LIMITĂ STRICTĂ**: 'suno_style' trebuie să fie sub 120 caractere.
+- **PRIORITATE**: Tag Gen > Mood > Instrumente > Voce.
+- **PENTRU MANELE**: Folosește "Romanian Manele, Oriental Folk, Accordion, Passionate Vocals".
+- **PENTRU DOINĂ**: Folosește "Romanian Doina, Free Rhythm, Soulful, Melancholic".
+- **PENTRU FOLCLOR**: Specifică regiunea (Transylvanian/Moldavian/Oltenia Folk).
+
+## REGULI VERSURI
+- Urmează EXACT 'Structura Blueprint' furnizată de utilizator.
+- **CRITIC: NU COPIA VERSURI DIN AUDIO. SCRIE VERSURI NOI.**
+- Folosește tag-uri structurale în română: [Intro], [Strofa 1], [Refren], [Bridge], [Outro].
+- Scrie versuri în **ROMÂNĂ**, cu rimă naturală și ritm potrivit genului.
+- Pentru Doină: versuri libere, cu dor, jale, nostalgie.
+- Pentru Manele: versuri pasionale, despre iubire, bani, prieteni, viață.
+- Pentru Folclor: versuri tradiționale, despre natură, sat, familie, sărbători.
+
+### PROTOCOL DUET
+Dacă vocea este "Duet Bărbat-Femeie":
+1. Etichetează fiecare secțiune: \`[Voce Masculină]\`, \`[Voce Feminină]\`, \`[Împreună]\`.
+2. Creează dialoguri tip "Chemare și Răspuns" în Bridge.
+
+## FUNCȚII AVANSATE
+- **MOD EARWORM**: Refren scurt, extrem de repetitiv, rimă simplă și memorabilă.
+- **UMANIZARE VOCALĂ**: Inserează tag-uri vocale: [respiratie], [oftat], [sunet], [soptit], [strigat].
+- **GHID MELODIE**: Adaugă indicații melodice în paranteze drepte: [urcare], [coborare], [legato], [staccato].
+- **ARMONII VOCALE**: Adaugă [Armonie], [Voci Fundal], [Cor], [Strat Vocal] în Refren.
 
 ## FORMAT OUTPUT
-You must return a JSON object.
+Returnează un obiect JSON.
 `;
 
 export const generateBlueprint = async (input: UserInput): Promise<SunoBlueprintResponse> => {
   if (!process.env.API_KEY) {
-    throw new Error("API Key is missing. Ensure process.env.API_KEY is configured.");
+    throw new Error("Cheia API lipsește. Asigurați-vă că process.env.API_KEY este configurat.");
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-  // Construct the prompt content
   const contents: any[] = [];
   
-  // 1. Add Audio Part if it exists
   if (input.audioData) {
     contents.push({
       inlineData: {
@@ -98,54 +131,53 @@ export const generateBlueprint = async (input: UserInput): Promise<SunoBlueprint
     });
   }
 
-  // 2. Add Text Prompt Part
-  let promptText = `Create a Suno AI blueprint (Title, Style, Lyrics) for the following song concept.`;
+  let promptText = `Creează un blueprint Suno AI (Titlu, Stil, Versuri) pentru următorul concept muzical românesc.`;
 
   if (input.audioData) {
     promptText += `
-    IMPORTANT: An audio reference file has been provided. 
-    1. **DEEP ANALYSIS REQUIRED**: Listen closely to the audio. 
-    2. **CRITICAL GENRE DISTINCTION (INDONESIA/MELAYU)**:
-       - **TARGET NUANCE**: "Mendayu-dayu" (Sentimental, Lilting, Sad).
-       - If the song sounds like **Arief**, **Thomas Arya**, or **Ipank** (Sad, Melodic, Synth-heavy, Cengkok Vocals): Classify as **"Pop Minang"** or **"Pop Melayu"**. 
-       - **STRICTLY AVOID "ROCK"**: Do not use "Rock" or "Power Ballad" for these sentimental synth-pop songs.
-       - Only use "Slow Rock" if there is heavy, distorted electric guitar driving the song (Search, Iklim style).
-    3. **ANALYZE TEXTURE**: Identify the Decade (e.g., 90s, 80s), Vocal Type (e.g., High Pitch Male, Power Vocals), and Key Instruments.
-    4. **CONSTRUCT STYLE**: Use these specific characteristics to build the 'suno_style'. Specificity helps Suno generate better results.
-    5. CRITICAL: DO NOT TRANSCRIBE THE LYRICS FROM THE AUDIO. The audio is for STYLE reference only. You must generate COMPLETELY NEW LYRICS based on the user's topic/story.
+    IMPORTANT: A fost furnizat un fișier audio de referință.
+    1. **ANALIZĂ PROFUNDĂ NECESARĂ**: Ascultă cu atenție audio-ul.
+    2. **DISTINCȚIE CRITICĂ GEN ROMÂNESC**:
+       - Dacă sună ca **Manele Clasice** (Florin Salam, Nicolae Guță): Clasifică drept "Romanian Manele, Lautareasca, Oriental Folk".
+       - Dacă sună ca **Muzică Populară** (folclor regional): Specifică regiunea (Ardeleană/Moldovenească/Oltenească).
+       - Dacă sună ca **Doină**: Clasifică drept "Romanian Doina, Free Rhythm, Melancholic".
+       - Dacă sună ca **Muzică Lăutărească**: Folosește "Lautareasca, Romanian Gypsy Music, Virtuoso Violin".
+    3. **ANALIZEAZĂ TEXTURA**: Identifică Decada, Tipul Vocal, și Instrumentele Cheie.
+    4. **CONSTRUIEȘTE STILUL**: Folosește aceste caracteristici pentru 'suno_style'.
+    5. CRITIC: NU TRANSCRIE VERSURILE DIN AUDIO. Generează versuri 100% ORIGINALE.
     `;
   }
 
   promptText += `
-    User Preferences:
-    - Genre/Style Input: ${input.genre || "Analyze from audio (Be specific! Avoid generic terms)"}
-    - Mood/Vibe Input: ${input.mood || "Analyze from audio"}
+    Preferințele Utilizatorului:
+    - Gen/Stil Input: ${input.genre || "Analizează din audio (Fii specific! Evită termeni generici)"}
+    - Mood/Atmosferă Input: ${input.mood || "Analizează din audio"}
     
-    - Vocals Input: ${input.vocals.includes('Auto') ? "ANALYZE FROM AUDIO (Identify if Male/Female/Duet/etc)" : input.vocals}
-    - Tempo Input: ${input.tempo.includes('Auto') ? "ANALYZE FROM AUDIO (Identify BPM range)" : input.tempo}
-    - Language: ${input.language.includes('Auto') ? "ANALYZE FROM AUDIO (Identify language or default to English)" : input.language}
+    - Voce Input: ${input.vocals.includes('Auto') ? "ANALIZEAZĂ DIN AUDIO (Identifică dacă e Masculin/Feminin/Duet/etc)" : input.vocals}
+    - Tempo Input: ${input.tempo.includes('Auto') ? "ANALIZEAZĂ DIN AUDIO (Identifică intervalul BPM)" : input.tempo}
+    - Limbă: ${input.language.includes('Auto') ? "ANALIZEAZĂ DIN AUDIO (Identifică limba, implicit Română)" : input.language}
     
-    - Specific Instruments (MUST BE INCLUDED IN STYLE): ${input.instruments && input.instruments.length > 0 ? input.instruments.join(', ') : "None selected"}
+    - Instrumente Specifice (TREBUIE INCLUSE ÎN STIL): ${input.instruments && input.instruments.length > 0 ? input.instruments.join(', ') : "Niciunul selectat"}
     
-    - Additional Details: ${input.additionalDetails}
+    - Detalii Suplimentare: ${input.additionalDetails}
     
-    PRODUCTION TEXTURE PREFERENCE: ${input.productionTexture} (Ensure this sonic characteristic is explicitly included in the 'suno_style' to define the audio quality).
+    TEXTURĂ DE PRODUCȚIE: ${input.productionTexture} (Asigură-te că această caracteristică sonoră este inclusă explicit în 'suno_style').
 
-    STRUCTURE BLUEPRINT: ${input.structure ? input.structure : "AUTO-DETECT (If audio is present, analyze and mimic its structure. If not, choose best fit for genre)."}
+    STRUCTURA BLUEPRINT: ${input.structure ? input.structure : "AUTO-DETECT (Dacă există audio, analizează și mimează structura lui. Dacă nu, alege ce se potrivește cel mai bine genului)."}
 
-    ADVANCED SETTINGS:
-    - EARWORM MODE: ${input.isEarworm ? "ENABLED (Make it extremely catchy and repetitive)" : "Disabled"}
-    - HUMANIZE VOCALS: ${input.isHumanize ? "ENABLED (Inject breaths, laughs, etc)" : "Disabled"}
-    - MELODY GUIDE: ${input.isMelodyGuide ? "ENABLED (Add instructional tags using SQUARE BRACKETS [ ] ONLY, do not use parentheses)" : "Disabled"}
-    - VOCAL HARMONY: ${input.isHarmony ? "ENABLED (Include harmony tags like [Harmony] or [Backing Vocals] in lyrics and style)" : "Disabled"}
+    SETĂRI AVANSATE:
+    - MOD EARWORM: ${input.isEarworm ? "ACTIVAT (Fă-l extrem de memorabil și repetitiv)" : "Dezactivat"}
+    - UMANIZARE VOCALĂ: ${input.isHumanize ? "ACTIVAT (Injectează respirații, oftaturi, etc)" : "Dezactivat"}
+    - GHID MELODIE: ${input.isMelodyGuide ? "ACTIVAT (Adaugă tag-uri instrucționale folosind DOAR PARANTEZE DREPTE [ ])" : "Dezactivat"}
+    - ARMONII VOCALE: ${input.isHarmony ? "ACTIVAT (Include tag-uri de armonie [Armonie] sau [Voci Fundal] în versuri și stil)" : "Dezactivat"}
   `;
 
   contents.push({ text: promptText });
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview', 
-      contents: input.audioData ? { parts: contents } : contents[contents.length - 1].text, 
+      model: 'gemini-3-flash-preview',
+      contents: input.audioData ? { parts: contents } : contents[contents.length - 1].text,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
@@ -154,19 +186,19 @@ export const generateBlueprint = async (input: UserInput): Promise<SunoBlueprint
           properties: {
             suno_title: {
               type: Type.STRING,
-              description: "A creative, catchy, and relevant title for the song.",
+              description: "Un titlu creativ, catchy și relevant pentru melodie, în română.",
             },
             suno_style: {
               type: Type.STRING,
-              description: "The optimized style prompt for Suno (max 120 chars). Derived from audio reference if provided. Include the production texture tags and the specific instruments requested.",
+              description: "Prompt-ul de stil optimizat pentru Suno (max 120 caractere). Derivat din referința audio dacă există. Include textura de producție și instrumentele specifice solicitate.",
             },
             suno_lyrics: {
               type: Type.STRING,
-              description: "The complete lyrics with bracketed structural tags. IMPORTANT: Structure MUST follow the provided 'Structure Blueprint'. Include [breath] tags if Humanize is on. Lyrics must be ORIGINAL, do not copy from audio. If Duet, strictly follow Duet tagging rules.",
+              description: "Versurile complete cu tag-uri structurale în paranteze drepte. Structura TREBUIE să urmeze 'Structura Blueprint' furnizată. Include tag-uri [respiratie] dacă Umanizarea e activată. Versurile trebuie să fie ORIGINALE, nu copia din audio. Dacă e Duet, urmează strict regulile de etichetare Duet.",
             },
             analysis: {
               type: Type.STRING,
-              description: "Brief explanation of why this combination was chosen, noting the specific sub-genre detected from audio.",
+              description: "Explicație scurtă în română despre de ce a fost aleasă această combinație, menționând sub-genul specific detectat din audio.",
             },
           },
           required: ["suno_title", "suno_style", "suno_lyrics", "analysis"],
@@ -177,21 +209,20 @@ export const generateBlueprint = async (input: UserInput): Promise<SunoBlueprint
     if (response.text) {
       return JSON.parse(response.text) as SunoBlueprintResponse;
     }
-    throw new Error("No response generated");
+    throw new Error("Nu a fost generat niciun răspuns.");
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
+    console.error("Eroare Gemini API:", error);
     
-    // Robust Error Handling for High Traffic / Many Users
     if (error.status === 429) {
-      throw new Error("⚠️ Traffic Tinggi: Server sedang sibuk (Rate Limit). Silakan tunggu 1 menit dan coba tekan tombol Retry.");
+      throw new Error("⚠️ Trafic Ridicat: Serverul este ocupat (Rate Limit). Te rugăm să aștepți 1 minut și să apeși butonul Încearcă din nou.");
     }
     if (error.status === 503) {
-      throw new Error("⚠️ Server Overloaded: AI sedang memproses banyak permintaan. Coba lagi sebentar lagi.");
+      throw new Error("⚠️ Server Supraîncărcat: AI-ul procesează multe cereri. Încearcă din nou în câteva momente.");
     }
     if (error.message && error.message.includes("SAFETY")) {
-      throw new Error("⚠️ Safety Filter: Permintaan ditolak karena konten dianggap tidak aman. Coba ubah deskripsi lagu.");
+      throw new Error("⚠️ Filtru de Siguranță: Cererea a fost respinsă deoarece conținutul a fost considerat inadecvat. Încearcă să modifici descrierea melodiei.");
     }
 
-    throw new Error("Gagal terhubung ke AI Architect. Periksa koneksi atau coba lagi nanti.");
+    throw new Error("Conectarea la AI Arhitect a eșuat. Verifică conexiunea sau încearcă din nou mai târziu.");
   }
 };
